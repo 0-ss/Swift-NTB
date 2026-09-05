@@ -13,3 +13,5 @@ This command is good for client.py, it makes client.py a .exe file, runs with no
 Here's the command :
 
 pyinstaller --noconsole --onefile client.py
+
+pyinstaller --noconsole --onefile --hidden-import pyautogui --hidden-import pyperclip --hidden-import PIL --hidden-import winreg --hidden-import ctypes client.py
